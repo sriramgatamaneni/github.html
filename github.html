@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub Repositories</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h2>GitHub Repositories</h2>
+    <input type="text" id="username" placeholder="Enter GitHub username">
+    <button onclick="fetchRepos()">Fetch Repos</button>
+    <p id="status"></p>
+    <table id="repoTable">
+        <thead>
+            <tr>
+                <th>Repository Name</th>
+                <th>Description</th>
+                <th>Language</th>
+                <th>Stars</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <script>
+        function fetchRepos() {
+            var username = document.getElementById("username").value;
+            var url = "https://api.github.com/users/" + username + "/repos";
+            var xhr = new XMLHttpRequest();
+            document.getElementById("status").textContent = "Fetching data...";
+
+            xhr.open("GET", url, true);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+				
+					//write your code here......
+                    var repos = JSON.parse(xhr.responseText);
+                var tableBody = document.querySelector("#repoTable tbody");
+                tableBody.innerHTML = ""; // Clear previous results
+                
+                repos.forEach(repo => {
+                    var row = document.createElement("tr");
+                    row.innerHTML = `
+                        <td><a href="${repo.html_url}" target="_blank">${repo.name}</a></td>
+                        <td>${repo.description || "No description"}</td>
+                        <td>${repo.language || "Not specified"}</td>
+                        <td>${repo.stargazers_count}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+
+                document.getElementById("status").textContent = "Repositories loaded successfully.";
+           
+				
+                } else if (xhr.readyState === 4) {
+                    document.getElementById("status").textContent = "Error fetching repositories.";
+                }
+            };
+            xhr.send();
+        }
+    </script>
+</body>
+</html>
